@@ -1,16 +1,24 @@
 {
     "manifest_version": 2,
- 
-    "name": "Click It", 
-    "description": "My first Chrome extension.",
+    "name": "Conventional Merges", 
     "version": "1.0",
-    "author": "Emad Elmogy",
-    "browser_action": {
-        "default_icon": "icon.png",
-        "default_popup": "popup.html",
-        "default_title": "My custom google Extension"
+    "default_locale": "en",
+    "description": "Checks for conventional commits on merge",
+    "author": "HomeXLabs",
+    "page_action": {
+        "default_icon": {
+            "128": "icon.png"
+        },
+        "default_title": "Conventional Merges",
+        "default_popup": "popup.html"
     },
     "permissions": [
-        "activeTab"
-     ]
+        "activeTab"    
+    ],
+    "content-script": {
+        "matches": ["https://*github.*/*/pull.*"],
+        "js": ["popup.js"]
+    },
+    "homepage_url": "https://github.com/HomeXLabs/conventional-merges",
+    
 }
