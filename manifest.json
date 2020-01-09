@@ -6,11 +6,8 @@
     "description": "Checks for conventional commits on merge",
     "author": "HomeXLabs",
     "page_action": {
-        "default_icon": {
-            "128": "icon.png"
-        },
-        "default_title": "Conventional Merges",
-        "default_popup": "popup.html"
+        "default_icon": "icon.png",
+        "default_title": "Conventional Merges"
     },
     "permissions": [
         "activeTab"    
@@ -19,6 +16,5 @@
         "matches": ["https://*github.*/*/pull.*"],
         "js": ["popup.js"]
     },
-    "homepage_url": "https://github.com/HomeXLabs/conventional-merges",
-    
+    "homepage_url": "https://github.com/HomeXLabs/conventional-merges"
 }
