@@ -10,10 +10,8 @@ const titlePattern = /^(feat|chore|fix|ci|build|docs|style|refactor|perf|test)(\
 window.addEventListener('DOMContentLoaded', () => {
   console.log('loaded');
 
-  const mergeTitleField = document.getElementById('merge_title_field');
-  const mergeButtons = document.querySelectorAll(
-    'button.js-merge-commit-button',
-  );
+  let mergeTitleField = document.getElementById('merge_title_field');
+  let mergeButtons = document.querySelectorAll('button.js-merge-commit-button');
 
   /**
    * The 'change' event isn't triggered when the value is programatically updated
@@ -24,39 +22,59 @@ window.addEventListener('DOMContentLoaded', () => {
    * To resolve this, we add 'click' event listeners to each of these buttons to
    * check the title again.
    */
-  const mergeTypeButtons = document.querySelectorAll(
+  let mergeTypeButtons = document.querySelectorAll(
     "button[data-details-container='.js-merge-pr']",
   );
 
-  mergeTypeButtons.forEach(mergeTypeButton => {
-    mergeTypeButton.addEventListener('click', () => {
-      const { value } = mergeTitleField;
-      console.log('click', value);
-      handleMergeTitleChange(value, mergeTitleField, mergeButtons);
+  const applyEventListeners = () => {
+    mergeTypeButtons.forEach(mergeTypeButton => {
+      mergeTypeButton.addEventListener('click', () => {
+        const { value } = mergeTitleField;
+        console.log('click', value);
+        handleMergeTitleChange(value, mergeTitleField, mergeButtons);
+      });
     });
-  });
 
-  // Initial page load check.
-  handleMergeTitleChange(
-    mergeTitleField ? mergeTitleField.value : '',
-    null,
-    mergeButtons,
-  );
+    // Initial page load check.
+    handleMergeTitleChange(
+      mergeTitleField ? mergeTitleField.value : '',
+      null,
+      mergeButtons,
+    );
 
-  /**
-   * Add the various even listeners to the input field ('change', and 'input')
-   */
-  mergeTitleField.addEventListener('change', e => {
-    const { value } = e.target;
-    handleMergeTitleChange(value, null, mergeButtons);
-    console.log('change', value);
-  });
+    /**
+     * Add the various even listeners to the input field ('change', and 'input')
+     */
+    mergeTitleField.addEventListener('change', e => {
+      const { value } = e.target;
+      handleMergeTitleChange(value, null, mergeButtons);
+      console.log('change', value);
+    });
 
-  mergeTitleField.addEventListener('input', e => {
-    const { value } = e.target;
-    handleMergeTitleChange(value, null, mergeButtons);
-    console.log('input', value);
-  });
+    mergeTitleField.addEventListener('input', e => {
+      const { value } = e.target;
+      handleMergeTitleChange(value, null, mergeButtons);
+      console.log('input', value);
+    });
+  };
+
+  if (!mergeTitleField) {
+    const tryAgain = () =>
+      window.setTimeout(() => {
+        console.log('Trying again.');
+        mergeTitleField = document.getElementById('merge_title_field');
+        mergeButtons = document.querySelectorAll(
+          'button.js-merge-commit-button',
+        );
+        mergeTypeButtons = document.querySelectorAll(
+          "button[data-details-container='.js-merge-pr']",
+        );
+        if (!mergeTitleField) tryAgain();
+      }, 3000);
+    tryAgain();
+  } else {
+    applyEventListeners();
+  }
 });
 
 /**
