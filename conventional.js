@@ -22,7 +22,7 @@ window.addEventListener('DOMContentLoaded', () => {
    * To resolve this, we add 'click' event listeners to each of these buttons to
    * check the title again.
    */
-  const mergeTypeButtons = document.querySelectorAll(
+  let mergeTypeButtons = document.querySelectorAll(
     "button[data-details-container='.js-merge-pr']",
   );
 
