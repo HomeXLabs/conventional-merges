@@ -12,7 +12,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   const mergeTitleField = document.getElementById('merge_title_field');
   const mergeButtons = document.querySelectorAll(
-    "button[data-disable-with='Merging…']",
+    'button.js-merge-commit-button',
   );
 
   /**
@@ -37,7 +37,7 @@ window.addEventListener('DOMContentLoaded', () => {
   });
 
   // Initial page load check.
-  handleMergeTitleChange(mergeTitleField.value, null, mergeButtons);
+  handleMergeTitleChange(mergeTitleField?.value || '', null, mergeButtons);
 
   /**
    * Add the various even listeners to the input field ('change', and 'input')
