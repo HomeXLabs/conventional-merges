@@ -2,19 +2,15 @@
     "manifest_version": 2,
     "name": "Conventional Merges", 
     "version": "1.0",
-    "default_locale": "en",
     "description": "Checks for conventional commits on merge",
     "author": "HomeXLabs",
     "page_action": {
         "default_icon": "icon.png",
         "default_title": "Conventional Merges"
     },
-    "permissions": [
-        "activeTab"    
-    ],
-    "content-script": {
-        "matches": ["https://*github.*/*/pull.*"],
-        "js": ["popup.js"]
-    },
+    "content_scripts": [{
+        "matches": ["https://github.com/*pull*"],
+        "js": ["conventional.js"]
+    }],
     "homepage_url": "https://github.com/HomeXLabs/conventional-merges"
 }
