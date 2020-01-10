@@ -66,7 +66,11 @@ window.addEventListener('DOMContentLoaded', () => {
       mergeTypeButtons = document.querySelectorAll(
         "button[data-details-container='.js-merge-pr']",
       );
-      if (!mergeTitleField) window.setTimeout(tryAgain, 3000);
+      if (!mergeTitleField) {
+        window.setTimeout(tryAgain, 3000);
+      } else {
+        console.log('found em!');
+      }
     };
     window.setTimeout(tryAgain, 3000);
   } else {
