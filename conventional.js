@@ -59,20 +59,23 @@ window.addEventListener('DOMContentLoaded', () => {
   };
 
   if (!mergeTitleField) {
-    const tryAgain = () =>
-      window.setTimeout(() => {
-        console.log('Trying again.');
-        mergeTitleField = document.getElementById('merge_title_field');
-        mergeButtons = document.querySelectorAll(
-          'button.js-merge-commit-button',
-        );
-        mergeTypeButtons = document.querySelectorAll(
-          "button[data-details-container='.js-merge-pr']",
-        );
-        if (!mergeTitleField) tryAgain();
-      }, 3000);
-    tryAgain();
+    const tryAgain = () => {
+      console.log('Trying again.');
+      mergeTitleField = document.getElementById('merge_title_field');
+      mergeButtons = document.querySelectorAll('button.js-merge-commit-button');
+      mergeTypeButtons = document.querySelectorAll(
+        "button[data-details-container='.js-merge-pr']",
+      );
+      if (!mergeTitleField) {
+        window.setTimeout(tryAgain, 3000);
+      } else {
+        console.log('found em!');
+        applyEventListeners();
+      }
+    };
+    window.setTimeout(tryAgain, 3000);
   } else {
+    console.log('found em!');
     applyEventListeners();
   }
 });
