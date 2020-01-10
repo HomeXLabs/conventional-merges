@@ -70,6 +70,7 @@ window.addEventListener('DOMContentLoaded', () => {
         window.setTimeout(tryAgain, 3000);
       } else {
         console.log('found em!');
+        applyEventListeners();
       }
     };
     window.setTimeout(tryAgain, 3000);
