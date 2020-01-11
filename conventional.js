@@ -1,4 +1,5 @@
 console.log('Conventional Merges 1.0');
+
 const titlePattern = /^(feat|chore|fix|ci|build|docs|style|refactor|perf|test)(\([a-z]+\)(!?):|(!?):) (.*)[^\.]$/;
 let mergeTitleField, mergeButtons, mergeTypeButtons;
 /**
@@ -9,6 +10,14 @@ let mergeTitleField, mergeButtons, mergeTypeButtons;
  */
 window.addEventListener('DOMContentLoaded', () => {
   console.log('loaded');
+  let useSuffix = false;
+  console.log('use suffix?', useSuffix);
+  chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+    console.log('something happening from the extension');
+    useSuffix = request.useSuffix;
+    console.log('use suffix?', useSuffix);
+    // sendResponse({ data: data, success: true });
+  });
 
   locateFields();
 
