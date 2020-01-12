@@ -12,6 +12,7 @@ window.addEventListener('DOMContentLoaded', () => {
   console.log('loaded');
   let useSuffix = false;
   console.log('use suffix?', useSuffix);
+  chrome.runtime.sendMessage({ toDo: 'showPageAction' });
   chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     console.log('something happening from the extension');
     useSuffix = request.useSuffix;

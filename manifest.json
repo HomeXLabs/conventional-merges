@@ -4,12 +4,16 @@
   "version": "1.0",
   "description": "Checks for conventional commits on merge",
   "author": "HomeXLabs",
-  "browser_action": {
+  "page_action": {
     "default_title": "Conventional Merges",
     "default_icon": "icon.png",
     "default_popup": "popup.html"
   },
-  "permissions": ["activeTab"],
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+  "permissions": ["https://github.com/*pull*/*"],
   "content_scripts": [
     {
       "matches": ["https://github.com/*pull*/*"],
