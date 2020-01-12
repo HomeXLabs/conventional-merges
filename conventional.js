@@ -16,11 +16,18 @@ window.addEventListener('DOMContentLoaded', () => {
   // Send message to show extension popup (background script is listening).
   chrome.runtime.sendMessage({ toDo: 'showPopup' });
 
+  // Send message to show extension popup (popup script is listening).
+  chrome.runtime.sendMessage({ useSuffix });
+
   // Receive messages (popup script send these).
   chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-    const { useSuffix } = request;
-    localStorage.setItem('useSuffix', useSuffix);
-    console.log('Update useSuffix', useSuffix);
+    if (request.toDo == 'getSuffix') {
+      sendResponse({ useSuffix: localStorage.getItem('useSuffix') });
+    } else {
+      const { useSuffix } = request;
+      localStorage.setItem('useSuffix', useSuffix);
+      console.log('Update useSuffix', useSuffix);
+    }
   });
 
   locateFields();
