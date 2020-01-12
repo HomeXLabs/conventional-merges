@@ -1,7 +1,7 @@
 console.log('Conventional Merges 1.0');
 
 const titlePattern = /^(feat|chore|fix|ci|build|docs|style|refactor|perf|test)(\([a-z]+\)(!?):|(!?):) (.*)[^\.]$/;
-let mergeTitleField, mergeButtons, mergeTypeButtons;
+let mergeTitleField, mergeButtons, mergeTypeButtons, useSuffix;
 /**
  * "run_at": "document_end" wasn't operating as expected, instead we run at
  * initial page load and attach a 'DOMContentLoaded' event to the window.
@@ -10,14 +10,17 @@ let mergeTitleField, mergeButtons, mergeTypeButtons;
  */
 window.addEventListener('DOMContentLoaded', () => {
   console.log('loaded');
-  let useSuffix = false;
-  console.log('use suffix?', useSuffix);
-  chrome.runtime.sendMessage({ toDo: 'showPageAction' });
+  useSuffix = localStorage.getItem('useSuffix');
+  console.log('useSuffix from local storage:', useSuffix);
+
+  // Send message to show extension popup (background script is listening).
+  chrome.runtime.sendMessage({ toDo: 'showPopup' });
+
+  // Receive messages (popup script send these).
   chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-    console.log('something happening from the extension');
-    useSuffix = request.useSuffix;
-    console.log('use suffix?', useSuffix);
-    // sendResponse({ data: data, success: true });
+    const { useSuffix } = request;
+    localStorage.setItem('useSuffix', useSuffix);
+    console.log('Update useSuffix', useSuffix);
   });
 
   locateFields();
