@@ -1,6 +1,7 @@
 console.log('Conventional Merges 1.0');
 
 const titlePattern = /^(feat|chore|fix|ci|build|docs|style|refactor|perf|test)(\([a-z]+\)(!?):|(!?):) (.*)[^\.]$/;
+const titlePatternWithMandatorySuffix = /^(feat|chore|fix|ci|build|docs|style|refactor|perf|test)(\([a-z]+\)(!?):|(!?):) (.*)[^\.]$/;
 let mergeTitleField, mergeButtons, mergeTypeButtons, useSuffix;
 /**
  * "run_at": "document_end" wasn't operating as expected, instead we run at
@@ -114,7 +115,10 @@ function applyEventListeners() {
  * @param {HTMLElement[]} mergeButtons
  */
 function handleMergeTitleChange(titleValue, titleElement, mergeButtons) {
-  if (!titlePattern.test(titleValue)) {
+  const patternMatches = useSuffix
+    ? !titlePatternWithMandatorySuffix.test(titleValue)
+    : !titlePattern.test(titleValue);
+  if (patternMatches) {
     mergeButtons.forEach(mergeButton => {
       mergeButton.setAttribute('disabled', 'disabled');
       mergeButton.style.backgroundColor = '#d39494';
