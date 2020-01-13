@@ -28,7 +28,7 @@ window.addEventListener('DOMContentLoaded', () => {
       localStorage.setItem('useSuffix', newSuffix);
       useSuffix = newSuffix;
       console.log('Update useSuffix', useSuffix);
-      handleMergeTitleChange(mergeTitleField.value, null, mergeButtons);
+      handleMergeTitleChange();
     }
   });
 
@@ -80,29 +80,25 @@ function applyEventListeners() {
     mergeTypeButton.addEventListener('click', () => {
       const { value } = mergeTitleField;
       console.log('click', value);
-      handleMergeTitleChange(value, mergeTitleField, mergeButtons);
+      handleMergeTitleChange();
     });
   });
 
   // Initial page load check.
-  handleMergeTitleChange(
-    mergeTitleField ? mergeTitleField.value : '',
-    null,
-    mergeButtons,
-  );
+  handleMergeTitleChange();
 
   /**
    * Add the various even listeners to the input field ('change', and 'input')
    */
   mergeTitleField.addEventListener('change', e => {
     const { value } = e.target;
-    handleMergeTitleChange(value, null, mergeButtons);
+    handleMergeTitleChange();
     console.log('change', value);
   });
 
   mergeTitleField.addEventListener('input', e => {
     const { value } = e.target;
-    handleMergeTitleChange(value, null, mergeButtons);
+    handleMergeTitleChange();
     console.log('input', value);
   });
 }
@@ -110,23 +106,22 @@ function applyEventListeners() {
 /**
  * Updates the input field with styles and disables the 'Confirm merge' buttons
  * if the RegEx test fails.
- *
- * @param {string} titleValue
- * @param {HTMLElement} titleElement
- * @param {HTMLElement[]} mergeButtons
  */
-function handleMergeTitleChange(titleValue, titleElement, mergeButtons) {
+function handleMergeTitleChange() {
+  const { value } = mergeTitleField;
   const patternMatches = useSuffix
-    ? titlePatternWithMandatorySuffix.test(titleValue)
-    : titlePattern.test(titleValue);
+    ? titlePatternWithMandatorySuffix.test(value)
+    : titlePattern.test(value);
   if (!patternMatches) {
     mergeButtons.forEach(mergeButton => {
       mergeButton.setAttribute('disabled', 'disabled');
       mergeButton.style.backgroundColor = '#d39494';
     });
+    mergeTitleField.style.border = '1px solid red';
     return;
   }
 
+  mergeTitleField.style.border = '';
   mergeButtons.forEach(mergeButton => {
     mergeButton.removeAttribute('disabled');
   });
