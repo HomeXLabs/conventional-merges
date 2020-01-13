@@ -3,17 +3,37 @@
   <head>
     <title>Page Title</title>
     <style>
+      html {
+        background: #fa6673;
+      }
       .container {
-        width: 6rem;
-        height: 5rem;
+        padding: 0rem 0.5rem;
+        width: 10rem;
+        height: 10rem;
+      }
+      .title {
+        font-size: 1rem;
+        color: #fff;
+      }
+      label {
+        display: flex;
+      }
+      .label-text {
+        color: #fff;
+        margin-left: 0.2rem;
       }
     </style>
   </head>
   <body>
     <div class="container">
+      <h1 class="title">Conventional Merges</h1>
       <label>
-        Include suffix
         <input id="suffix-checkbox" type="checkbox" />
+        <div class="label-text">
+          Require references
+          <br />
+          i.e (#1234567)
+        </div>
       </label>
     </div>
   </body>
