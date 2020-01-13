@@ -1,6 +1,8 @@
 console.log('Conventional Merges 1.0');
+
 const titlePattern = /^(feat|chore|fix|ci|build|docs|style|refactor|perf|test)(\([a-z]+\)(!?):|(!?):) (.*)[^\.]$/;
-let mergeTitleField, mergeButtons, mergeTypeButtons;
+const titlePatternWithMandatorySuffix = /^(feat|chore|fix|ci|build|docs|style|refactor|perf|test)(\([a-z]+\)(!?):|(!?):) (.*)(\(#[0-9a-zA-Z]+\))$/;
+let mergeTitleField, mergeButtons, mergeTypeButtons, useSuffix;
 /**
  * "run_at": "document_end" wasn't operating as expected, instead we run at
  * initial page load and attach a 'DOMContentLoaded' event to the window.
@@ -9,6 +11,26 @@ let mergeTitleField, mergeButtons, mergeTypeButtons;
  */
 window.addEventListener('DOMContentLoaded', () => {
   console.log('loaded');
+  useSuffix = JSON.parse(localStorage.getItem('useSuffix'));
+  console.log('useSuffix from local storage:', useSuffix);
+
+  // Send message to show extension popup (background script is listening).
+  chrome.runtime.sendMessage({ toDo: 'showPopup' });
+
+  // Receive messages (popup script send these).
+  chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+    if (request.toDo == 'getSuffix') {
+      sendResponse({
+        useSuffix: JSON.parse(localStorage.getItem('useSuffix')),
+      });
+    } else {
+      const newSuffix = request.useSuffix;
+      localStorage.setItem('useSuffix', newSuffix);
+      useSuffix = newSuffix;
+      console.log('Update useSuffix', useSuffix);
+      handleMergeTitleChange();
+    }
+  });
 
   locateFields();
 
@@ -58,29 +80,25 @@ function applyEventListeners() {
     mergeTypeButton.addEventListener('click', () => {
       const { value } = mergeTitleField;
       console.log('click', value);
-      handleMergeTitleChange(value, mergeTitleField, mergeButtons);
+      handleMergeTitleChange();
     });
   });
 
   // Initial page load check.
-  handleMergeTitleChange(
-    mergeTitleField ? mergeTitleField.value : '',
-    null,
-    mergeButtons,
-  );
+  handleMergeTitleChange();
 
   /**
    * Add the various even listeners to the input field ('change', and 'input')
    */
   mergeTitleField.addEventListener('change', e => {
     const { value } = e.target;
-    handleMergeTitleChange(value, null, mergeButtons);
+    handleMergeTitleChange();
     console.log('change', value);
   });
 
   mergeTitleField.addEventListener('input', e => {
     const { value } = e.target;
-    handleMergeTitleChange(value, null, mergeButtons);
+    handleMergeTitleChange();
     console.log('input', value);
   });
 }
@@ -88,20 +106,22 @@ function applyEventListeners() {
 /**
  * Updates the input field with styles and disables the 'Confirm merge' buttons
  * if the RegEx test fails.
- *
- * @param {string} titleValue
- * @param {HTMLElement} titleElement
- * @param {HTMLElement[]} mergeButtons
  */
-function handleMergeTitleChange(titleValue, titleElement, mergeButtons) {
-  if (!titlePattern.test(titleValue)) {
+function handleMergeTitleChange() {
+  const { value } = mergeTitleField;
+  const patternMatches = useSuffix
+    ? titlePatternWithMandatorySuffix.test(value)
+    : titlePattern.test(value);
+  if (!patternMatches) {
     mergeButtons.forEach(mergeButton => {
       mergeButton.setAttribute('disabled', 'disabled');
       mergeButton.style.backgroundColor = '#d39494';
     });
+    mergeTitleField.style.border = '1px solid red';
     return;
   }
 
+  mergeTitleField.style.border = '';
   mergeButtons.forEach(mergeButton => {
     mergeButton.removeAttribute('disabled');
   });
