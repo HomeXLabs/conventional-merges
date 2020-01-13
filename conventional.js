@@ -1,7 +1,7 @@
 console.log('Conventional Merges 1.0');
 
 const titlePattern = /^(feat|chore|fix|ci|build|docs|style|refactor|perf|test)(\([a-z]+\)(!?):|(!?):) (.*)[^\.]$/;
-const titlePatternWithMandatorySuffix = /^(feat|chore|fix|ci|build|docs|style|refactor|perf|test)(\([a-z]+\)(!?):|(!?):) (.*)[^\.]$/;
+const titlePatternWithMandatorySuffix = /^(feat|chore|fix|ci|build|docs|style|refactor|perf|test)(\([a-z]+\)(!?):|(!?):) (.*)(\(#[0-9a-zA-Z]+\))$/;
 let mergeTitleField, mergeButtons, mergeTypeButtons, useSuffix;
 /**
  * "run_at": "document_end" wasn't operating as expected, instead we run at
@@ -11,23 +11,24 @@ let mergeTitleField, mergeButtons, mergeTypeButtons, useSuffix;
  */
 window.addEventListener('DOMContentLoaded', () => {
   console.log('loaded');
-  useSuffix = localStorage.getItem('useSuffix');
+  useSuffix = JSON.parse(localStorage.getItem('useSuffix'));
   console.log('useSuffix from local storage:', useSuffix);
 
   // Send message to show extension popup (background script is listening).
   chrome.runtime.sendMessage({ toDo: 'showPopup' });
 
-  // Send message to show extension popup (popup script is listening).
-  chrome.runtime.sendMessage({ useSuffix });
-
   // Receive messages (popup script send these).
   chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     if (request.toDo == 'getSuffix') {
-      sendResponse({ useSuffix: localStorage.getItem('useSuffix') });
+      sendResponse({
+        useSuffix: JSON.parse(localStorage.getItem('useSuffix')),
+      });
     } else {
-      const { useSuffix } = request;
-      localStorage.setItem('useSuffix', useSuffix);
+      const newSuffix = request.useSuffix;
+      localStorage.setItem('useSuffix', newSuffix);
+      useSuffix = newSuffix;
       console.log('Update useSuffix', useSuffix);
+      handleMergeTitleChange(mergeTitleField.value, null, mergeButtons);
     }
   });
 
@@ -116,9 +117,9 @@ function applyEventListeners() {
  */
 function handleMergeTitleChange(titleValue, titleElement, mergeButtons) {
   const patternMatches = useSuffix
-    ? !titlePatternWithMandatorySuffix.test(titleValue)
-    : !titlePattern.test(titleValue);
-  if (patternMatches) {
+    ? titlePatternWithMandatorySuffix.test(titleValue)
+    : titlePattern.test(titleValue);
+  if (!patternMatches) {
     mergeButtons.forEach(mergeButton => {
       mergeButton.setAttribute('disabled', 'disabled');
       mergeButton.style.backgroundColor = '#d39494';
