@@ -6,17 +6,19 @@ Merge confidently with this chrome extension that ensures your commits follow th
 
 Download Conventional Merges from the chrome web store.
 
-## Navigate To a Pull Request
+## Open a Github Pull Request
 
 ### **Bad**
 
-![bad commit](assets/images/bad.png | width=200)
+<img src="assets/images/bad.png" width="600">
 
 ### **Good**
 
-![good commit](assets/images/good.png | width=200)
+<img src="assets/images/good.png" width="600">
 
 ## Options
+
+<img src="assets/images/options.png" width="200">
 
 ## What's To Come?
 
