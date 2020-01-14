@@ -69,7 +69,7 @@ function getRegExpPattern({ useSuffix }) {
   const mandatorySuffixRegexp = useSuffix
     ? `(\\(#[0-9a-zA-Z]+[^.]{0}\\))`
     : `[^.]`;
-  const finalRegexp = `^(feat|chore|fix|ci|build|docs|style|refactor|perf|test)(\\([a-z]+\\)(!?):|(!?):) (.*)${mandatorySuffixRegexp}$`;
+  const finalRegexp = `^(feat|chore|fix|ci|build|docs|style|refactor|perf|test)(\\([a-z\\-]+\\)(!?):|(!?):) (.*)${mandatorySuffixRegexp}$`;
   return new RegExp(finalRegexp);
 }
 
