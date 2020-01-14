@@ -1,8 +1,3 @@
-console.log('Conventional Merges 1.0');
-
-const titlePattern = /^(feat|chore|fix|ci|build|docs|style|refactor|perf|test)(\([a-z]+\)(!?):|(!?):) (.*)[^\.]$/;
-const titlePatternWithMandatorySuffix = /^(feat|chore|fix|ci|build|docs|style|refactor|perf|test)(\([a-z]+\)(!?):|(!?):) (.*)(\(#[0-9a-zA-Z]+\))$/;
-let mergeTitleField, mergeButtons, mergeTypeButtons, useSuffix;
 /**
  * "run_at": "document_end" wasn't operating as expected, instead we run at
  * initial page load and attach a 'DOMContentLoaded' event to the window.
@@ -10,9 +5,16 @@ let mergeTitleField, mergeButtons, mergeTypeButtons, useSuffix;
  * This ensures the existence of each of our required elements.
  */
 window.addEventListener('DOMContentLoaded', () => {
-  console.log('loaded');
-  useSuffix = JSON.parse(localStorage.getItem('useSuffix'));
-  console.log('useSuffix from local storage:', useSuffix);
+  locateFields(githubFields =>
+    conventionalMerges({
+      ...githubFields,
+      useSuffix: JSON.parse(localStorage.getItem('useSuffix')),
+    }),
+  );
+});
+
+function conventionalMerges(githubFields) {
+  addEventListeners(githubFields);
 
   // Send message to show extension popup (background script is listening).
   chrome.runtime.sendMessage({ toDo: 'showPopup' });
@@ -24,94 +26,57 @@ window.addEventListener('DOMContentLoaded', () => {
         useSuffix: JSON.parse(localStorage.getItem('useSuffix')),
       });
     } else {
-      const newSuffix = request.useSuffix;
-      localStorage.setItem('useSuffix', newSuffix);
-      useSuffix = newSuffix;
-      console.log('Update useSuffix', useSuffix);
-      handleMergeTitleChange();
+      const { useSuffix } = request;
+      localStorage.setItem('useSuffix', useSuffix);
+      githubFields.useSuffix = useSuffix;
+      handleMergeTitleChange(githubFields);
     }
   });
 
-  locateFields();
-
-  if (!mergeTitleField) {
-    window.setTimeout(secondAttemptLocateFields, 3000);
-  } else {
-    console.log('found em!');
-    applyEventListeners();
-  }
-});
-
-function locateFields() {
-  mergeTitleField = document.getElementById('merge_title_field');
-  mergeButtons = document.querySelectorAll('button.js-merge-commit-button');
-
-  /**
-   * The 'change' event isn't triggered when the value is programatically updated
-   * after selected a new merge type.
-   *
-   * (i.e. 'Merge pull request', 'Squash and merge').
-   *
-   * To resolve this, we add 'click' event listeners to each of these buttons to
-   * check the title again.
-   */
-  mergeTypeButtons = document.querySelectorAll(
-    "button[data-details-container='.js-merge-pr']",
-  );
+  handleMergeTitleChange(githubFields);
 }
 
-function secondAttemptLocateFields() {
-  console.log('Trying again.');
-  mergeTitleField = document.getElementById('merge_title_field');
-  mergeButtons = document.querySelectorAll('button.js-merge-commit-button');
-  mergeTypeButtons = document.querySelectorAll(
+function locateFields(callback) {
+  let mergeTitleField = document.getElementById('merge_title_field');
+  let mergeButtons = document.querySelectorAll('button.js-merge-commit-button');
+  let mergeTypeButtons = document.querySelectorAll(
     "button[data-details-container='.js-merge-pr']",
   );
-  if (!mergeTitleField) {
-    window.setTimeout(secondAttemptLocateFields, 3000);
+
+  if (!mergeTitleField || !mergeButtons.length || !mergeTypeButtons.length) {
+    window.setTimeout(locateFields.bind(null, callback), 3000);
   } else {
-    console.log('found em!');
-    applyEventListeners();
+    callback({ mergeTitleField, mergeButtons, mergeTypeButtons });
   }
 }
 
-function applyEventListeners() {
-  mergeTypeButtons.forEach(mergeTypeButton => {
-    mergeTypeButton.addEventListener('click', () => {
-      const { value } = mergeTitleField;
-      console.log('click', value);
-      handleMergeTitleChange();
-    });
-  });
-
-  // Initial page load check.
-  handleMergeTitleChange();
-
-  /**
-   * Add the various even listeners to the input field ('change', and 'input')
-   */
-  mergeTitleField.addEventListener('change', e => {
-    const { value } = e.target;
-    handleMergeTitleChange();
-    console.log('change', value);
-  });
-
-  mergeTitleField.addEventListener('input', e => {
-    const { value } = e.target;
-    handleMergeTitleChange();
-    console.log('input', value);
-  });
+function addEventListeners(githubFields) {
+  const { mergeTitleField, mergeTypeButtons } = githubFields;
+  mergeTypeButtons.forEach(mergeTypeButton =>
+    mergeTypeButton.addEventListener('click', () =>
+      handleMergeTitleChange(githubFields),
+    ),
+  );
+  mergeTitleField.addEventListener('change', () =>
+    handleMergeTitleChange(githubFields),
+  );
+  mergeTitleField.addEventListener('input', () =>
+    handleMergeTitleChange(githubFields),
+  );
 }
 
-/**
- * Updates the input field with styles and disables the 'Confirm merge' buttons
- * if the RegEx test fails.
- */
-function handleMergeTitleChange() {
+function getRegExpPattern({ useSuffix }) {
+  const mandatorySuffixRegexp = useSuffix
+    ? `(\\(#[0-9a-zA-Z]+[^.]{0}\\))`
+    : `[^.]`;
+  const finalRegexp = `^(feat|chore|fix|ci|build|docs|style|refactor|perf|test)(\\([a-z]+\\)(!?):|(!?):) (.*)${mandatorySuffixRegexp}$`;
+  return new RegExp(finalRegexp);
+}
+
+function handleMergeTitleChange({ mergeTitleField, mergeButtons, useSuffix }) {
   const { value } = mergeTitleField;
-  const patternMatches = useSuffix
-    ? titlePatternWithMandatorySuffix.test(value)
-    : titlePattern.test(value);
+  const regexpPattern = getRegExpPattern({ useSuffix });
+  const patternMatches = regexpPattern.test(value);
   if (!patternMatches) {
     mergeButtons.forEach(mergeButton => {
       mergeButton.setAttribute('disabled', 'disabled');
