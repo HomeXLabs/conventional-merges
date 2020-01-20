@@ -1,3 +1,5 @@
+let didLocateFields = false;
+
 /**
  * "run_at": "document_end" wasn't operating as expected, instead we run at
  * initial page load and attach a 'DOMContentLoaded' event to the window.
@@ -44,9 +46,26 @@ function locateFields(callback) {
   );
 
   if (!mergeTitleField || !mergeButtons.length || !mergeTypeButtons.length) {
-    window.setTimeout(locateFields.bind(null, callback), 3000);
+    const mergePrContainer = document.querySelector('.merge-pr');
+
+    const observer = new MutationObserver(() => {
+      if (!didLocateFields) {
+        callback({ mergeTitleField, mergeButtons, mergeTypeButtons });
+        didLocateFields = true;
+        console.log('callback deferred');
+      }
+    });
+
+    observer.observe(mergePrContainer, {
+      attributes: true,
+      attributeFilter: ['class'],
+    });
   } else {
-    callback({ mergeTitleField, mergeButtons, mergeTypeButtons });
+    if (!didLocateFields) {
+      callback({ mergeTitleField, mergeButtons, mergeTypeButtons });
+      didLocateFields = true;
+      console.log('callback initial');
+    }
   }
 }
 
