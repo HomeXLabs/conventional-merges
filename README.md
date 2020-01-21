@@ -4,23 +4,23 @@ Merge confidently with this chrome extension that ensures your commits follow th
 
 ## Usage
 
-Download Conventional Merges from the chrome web store.
+Download [Conventional Merges](<(https://chrome.google.com/webstore/detail/conventional-merges/bnpeagecgekcbeaniedbepadngcjlhgp)>) from the chrome web store.
 
-## Open a Github Pull Request
+### Open a Github Pull Request
 
-### **Bad**
+#### **Bad**
 
 <img src="assets/images/bad.png" width="600">
 
-### **Good**
+#### **Good**
 
 <img src="assets/images/good.png" width="600">
 
-## Options
+### Options
 
 <img src="assets/images/options.png" width="200">
 
-## What's To Come?
+## Contributing
 
 We would love to build on this initial implementation with your help! Please read our contribution guide (coming soon)
 
