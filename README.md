@@ -4,7 +4,7 @@ Merge confidently with this chrome extension that ensures your commits follow th
 
 ## Usage
 
-Download [Conventional Merges](<(https://chrome.google.com/webstore/detail/conventional-merges/bnpeagecgekcbeaniedbepadngcjlhgp)>) from the chrome web store.
+Download [Conventional Merges](https://chrome.google.com/webstore/detail/conventional-merges/bnpeagecgekcbeaniedbepadngcjlhgp) from the chrome web store.
 
 ### Open a Github Pull Request
 
